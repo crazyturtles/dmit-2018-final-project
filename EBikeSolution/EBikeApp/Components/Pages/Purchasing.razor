@@ -1,0 +1,172 @@
+﻿@page "/Purchasing"
+@using EBikeApp.Components.Layout
+<h1>Purchasing</h1>
+
+<header>
+    @if (hasFeedBack)
+    {
+        <blockquote class="success">@feedBackMessage</blockquote>
+    }
+    @if (hasError)
+    {
+        <blockquote class="error">
+            @errorMessage
+            <ul>
+                @foreach (var detail in errorDetails)
+                {
+                    <li>@detail</li>
+                }
+            </ul>
+        </blockquote>
+    }
+</header>
+<body>
+<div class="row">
+        <div class="col-md-2">
+            <select @bind="vendorID" class="form-select">
+                <option value="0">Select...</option>
+                @foreach (var vendor in vendorsList)
+                {
+                    <option value="@vendor.VendorID">@vendor.VendorName</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button @onclick="FindOrder" class="btn btn-link">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="text-decoration-none text-dark" viewBox="0 0 16 16">
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0" />
+                </svg> Find Order
+            </button>
+        </div>
+        <div class="col-md-2">
+            <label>Phone: @selectedVendorPhone</label>
+        </div>
+        <div class="col-md-2">
+            <label>City: @selectedVendorCity</label>
+        </div>
+        <div class="col-md-2">
+            <label>PO #: @(POnumber == 0 ? "New Order" : POnumber.ToString())</label>
+        </div>
+</div>
+<br />
+<div class="d-flex justify-content-center">
+    <div class="col-md-2">
+        <button @onclick="NewOrder" class="btn btn-primary">New Order</button>
+    </div>
+    <div class="col-md-2">
+        <button @onclick="PlaceOrder" class="btn btn-success">Place Order</button>
+    </div>
+    <div class="col-md-2">
+        <button @onclick="() => DeleteOrder(POid)" class="btn btn-danger">Delete Order</button>
+    </div>
+    <div class="col-md-2">
+        <button @onclick="Clear" class="btn btn-dark">Clear</button>
+    </div>
+</div>
+<br />
+@if (POD.Any())
+{
+    <div class="d-flex justify-content-center">
+        <div class="col-md-2">
+            <label>Subtotal: @POsubTotal.ToString("C")</label>
+        </div>
+        <div class="col-md-2">
+            <label>GST: @POgst.ToString("C")</label>
+        </div>
+        <div class="col-md-2">
+            <label>Total: @POtotal.ToString("C")</label>
+        </div>
+    </div>
+    <br />
+    <div class="d-flex justify-content-center">
+    <table class="table-bordered">
+        <thead>
+            <tr>
+                <th></th>
+                <th>ID</th>
+                <th>Description</th>
+                <th>QOH</th>
+                <th>ROL</th>
+                <th>QOO</th>
+                <th>QTO</th>
+                <th>Price</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var detail in POD)
+            {
+                <tr>
+                        <td>
+                            <button class="btn btn-link" @onclick="() => DeletePartFromOrder(detail)">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="text-decoration-none text-dark" viewBox="0 0 16 16">
+                                    <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z" />
+                                    <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z" />
+                                </svg>
+                            </button>
+                        </td>
+                    <td>@detail.PartID</td>
+                    <td>@detail.Description</td>
+                    <td>@detail.QOH</td>
+                    <td>@detail.ROL</td>
+                    <td>@detail.QOO</td>
+                    <td>
+                        <input type="text" @bind="detail.QTO" class="w-auto p-6"/>
+                    </td>
+                    <td>
+                        <input type="text" @bind="detail.Price" class="w-auto p-6"/>
+                    </td>
+                    <td>
+                                <button class="btn btn-link" @onclick="() => CalculateTotals()">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="text-decoration-none text-dark" viewBox="0 0 16 16">
+                                <path d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41m-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9" />
+                                <path fill-rule="evenodd" d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5 5 0 0 0 8 3M3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9z" />
+                            </svg>
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+}
+<br />
+<br />
+<br />
+@if (items.Any())
+    {
+        <div class="d-flex justify-content-center">
+            <table class="table-bordered">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Description</th>
+                        <th>QOH</th>
+                        <th>ROL</th>
+                        <th>QOO</th>
+                        <th>Buffer</th>
+                        <th>Price ($)</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in items)
+                    {
+                        <tr>
+                            <td>@item.PartID</td>
+                            <td>@item.PartDescription</td>
+                            <td>@item.QOH</td>
+                            <td>@item.ROL</td>
+                            <td>@item.QOO</td>
+                            <td>@(item.ROL - (item.QOH + item.QOO))</td>
+                            <td>@item.Price</td>
+                            <td>
+                                <button class="btn btn-primary" @onclick="() => AddPartToOrder(item)">Add</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</body>

@@ -1,0 +1,91 @@
+﻿@page "/Receiving/EditOutstandingOrderDetails/{PurchaseOrderID:int}/"
+@using EBikeApp.Components.Layout
+
+<h3>Partially Received Order Detail</h3>
+
+<br/>
+<header>
+    <h6>Po #: @purchaseOrder.PurchaseOrderNumber</h6>
+    <h6>Vendor Name: @purchaseOrder.VendorName</h6>
+    <h6>Vendor Phone: @purchaseOrder.VendorPhone</h6> 
+</header>
+<body>
+@if (receivingDetailView.Any() || receivingDetailView.Count() > 0)
+{
+    <TableTemplate Items="receivingDetailView" Context="ReceivingDetailView">
+        <TableHeader>
+            <th>Part ID</th>
+            <th>Description</th>
+            <th>Original Qty</th>
+            <th>Outstanding Qty</th>
+            <th>Received Qty</th>
+            <th>Return</th>
+            <th>Reason</th>
+        </TableHeader>
+        <RowTemplate>
+            <td>@ReceivingDetailView.PartID</td>
+            <td>@ReceivingDetailView.Description</td>
+            <td>@ReceivingDetailView.QtyOnOrder</td>
+            <td>@ReceivingDetailView.QtyOutstanding</td>
+            <td><input type="number" @bind="@ReceivingDetailView.QtyReceive" /></td>
+            <td><input type="number" @bind="@ReceivingDetailView.QtyReturn" /></td>
+            <td><input type="text" @bind="@ReceivingDetailView.Reason" /></td>           
+        </RowTemplate>
+    </TableTemplate>
+}
+    <button class="btn btn-primary" @onclick="ReceiveOrder">Receive</button>
+    <button class="btn btn-secondary" @onclick="ForceCloseOrder">Force Close</button>
+       <label for="reason">Force Close Reason:</label>
+       <input type="text"  @placeholder="Enter Reason"/>
+       
+    @if (unorderedReturnItems != null && unorderedReturnItems.Count > 0)
+    {
+        <h4>Unordered Items</h4>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Description</th>
+                    <th>Vendor Part ID</th>
+                    <th>Quantity</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in unorderedReturnItems)
+                {
+                    <tr>
+                        <td><input type="text" @bind="@item.Description" /></td>
+                        <td><input type="text" @bind="@item.VSN" /></td>
+                        <td><input type="number" @bind="@item.Quantity" /></td>
+                        <td><button class="btn btn-danger" @onclick="() => DeleteUnorderItem(item)">Delete</button></td>
+                    </tr>
+                }
+                <tr>
+                    <td><button class="btn btn-primary" @onclick="InsertUnorderItem">Insert</button></td>
+                    <td><button class="btn btn-warning" @onclick="ClearUnorderItem">Clear</button></td>
+                </tr>
+            </tbody>
+        </table>
+    }
+
+
+</body>
+<footer>
+    @if (hasFeedback)
+    {
+        <blockquote>@feedbackMessage</blockquote>
+    }
+    @if (hasError)
+    {
+        <blockquote>
+            @errorMessage
+            <ul>
+                @foreach (var detail in errorDetails)
+                {
+                    <li>@detail</li>
+                }
+            </ul>
+        </blockquote>
+    }
+</footer>
+

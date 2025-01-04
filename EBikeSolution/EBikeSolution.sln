@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34701.34
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EBikeApp", "EBikeApp\EBikeApp.csproj", "{0369AB8C-D6D5-45EC-A00F-656D5D39D3AA}"
+	ProjectSection(ProjectDependencies) = postProject
+		{64573435-D602-40A9-9DEE-FB0D8192D81D} = {64573435-D602-40A9-9DEE-FB0D8192D81D}
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EBikeLibrary", "EBikeLibrary\EBikeLibrary.csproj", "{64573435-D602-40A9-9DEE-FB0D8192D81D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0369AB8C-D6D5-45EC-A00F-656D5D39D3AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0369AB8C-D6D5-45EC-A00F-656D5D39D3AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0369AB8C-D6D5-45EC-A00F-656D5D39D3AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0369AB8C-D6D5-45EC-A00F-656D5D39D3AA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{64573435-D602-40A9-9DEE-FB0D8192D81D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{64573435-D602-40A9-9DEE-FB0D8192D81D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{64573435-D602-40A9-9DEE-FB0D8192D81D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{64573435-D602-40A9-9DEE-FB0D8192D81D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {AAB7DF76-4556-4176-B045-B8B7195A652B}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,64 @@
+﻿@page "/return"
+@using EBikeLibrary.ViewModels
+@using EBikeApp.Components.Layout
+
+<h3>Return</h3>
+
+<PageTitle>Returns</PageTitle>
+
+<body>
+    <div>
+        <h3>Sale Invoice #</h3>
+        <input type="number" @bind-value="invoiceid" style="width: 140px;" />
+
+        <button @onclick="LookupSale" class="btn btn-light">Lookup Sale</button>
+        <button @onclick="Clear" class="btn btn-light">Clear</button>
+    </div>
+    <div>
+        <TableTemplate Items="@saleRefundDetails" Context="SaleRefundDetailView">
+            <TableHeader>
+                <th>Item</th> 
+                <th>Org Qty</th>
+                <th>Price</th>
+                <th>Rtn Qty</th>
+                <th>Ref</th>
+                <th>Qty</th>
+                <th>Reason</th>
+            </TableHeader>
+            <RowTemplate>
+                <td>@SaleRefundDetailView.Description</td>                
+                <td>@SaleRefundDetailView.OriginalQuantity</td>
+                <td>@SaleRefundDetailView.SellingPrice</td>
+                <td>@SaleRefundDetailView.ReturnQuantity</td>
+                <td>@SaleRefundDetailView.Refundable</td>
+                <td><input type="number" @bind-value="@SaleRefundDetailView.ReturnQuantity" style="width=40px;"/></td>
+                <td><InputText @bind-Value="reason"></InputText></td>
+
+            </RowTemplate>
+        </TableTemplate>
+    </div>
+    <div>
+        <div>
+            <p>
+                Subtotal -
+                @subTotal
+            </p>
+            <p>
+                Tax - 
+                @tax
+            </p>
+            <p>
+                Discount - 
+                @discount
+            </p>
+            <p>
+                Total - @total
+            </p>
+        </div>
+        <div>
+            <button class="btn btn-success" @onclick="Refund">Refund</button>
+            <p>@currentRefund.DiscountPercent</p>
+            <p>Refund ID # @currentRefund.SaleID</p>
+        </div>
+    </div>
+</body>

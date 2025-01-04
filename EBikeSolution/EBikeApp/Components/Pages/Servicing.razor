@@ -1,0 +1,188 @@
+﻿@page "/servicing"
+@using EBikeApp.Components.Layout
+
+<h1 class="fw-bolder">Servicing</h1>
+
+@if (hasFeedback || hasError)
+{
+    <section class="feedback-box">
+        @if (hasFeedback)
+        {
+            <blockquote class="fst-italic">@feedbackMessage</blockquote>
+        }
+        @if (hasError)
+        {
+            <blockquote class="fst-italic">
+                @errorMessage
+                <ul>
+                    @foreach (var detail in errorDetails)
+                    {
+                        <li>@detail</li>
+                    }
+                </ul>
+            </blockquote>
+        }
+    </section>
+}
+
+<div class="d-flex justify-content-between flex-wrap gap-5 mb-5">
+    <div class="d-flex flex-column gap-4 mb-4">
+        <section class="d-flex gap-4 justify-content-between">
+            <h2>New</h2>
+            <button class="btn btn-dark" style="width: 8rem;" @onclick="Clear">Clear</button>
+            <button class="btn btn-success" disabled="@(currentJobDetails.Count == 0)" @onclick="RegisterJob" style="width: 8rem;">Register Job</button>
+        </section>
+
+        <section class="d-flex gap-4 align-content-between justify-content-between">
+
+
+            @if (selectedCustomer != null && !string.IsNullOrWhiteSpace(selectedCustomer.Name))
+            {
+                <div class="d-flex flex-column g-1">
+                    <h4 class="text-decoration-underline fw-bold text-nowrap">Selected Customer</h4>
+                    <h4 class="text-nowrap">@selectedCustomer.Name</h4>
+                </div>
+
+            }
+
+            <div class="input input-group" style="height: 2rem;">
+                <InputText type="text" class="form-control" style="width: 8rem;" @bind-Value="customerSearchValue" />
+                <button class="btn btn-primary" @onclick="CustomerLookup">Search</button>
+            </div>
+        </section>
+
+        @if (customers.Count != 0)
+        {
+            <TableTemplate Items="customers" Context="CustomerView">
+                <TableHeader>
+                    <th></th>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>Address</th>
+                </TableHeader>
+                <RowTemplate>
+                    <button class="btn text-decoration-underline text-primary" @onclick="() => SelectCustomer(CustomerView.CustomerID)">Select</button>
+                    <td>@CustomerView.Name</td>
+                    <td>@CustomerView.Phone</td>
+                    <td>@CustomerView.Address</td>
+                </RowTemplate>
+            </TableTemplate>
+
+
+            @if (selectedCustomer != null && selectedCustomersVehicles.Count != 0)
+            {
+                <h4 class="fw-bold">Select @(selectedCustomer.Name)'s vehicle</h4>
+
+                <select id="vehicleList" @onchange="OnVehicleSelectionChanged" class="form-control input-background">
+                    <option value="0">select...</option>
+                    @foreach (var vehicle in selectedCustomersVehicles)
+                    {
+                        <option value="@vehicle.VehicleIdentificationNumber">@vehicle.MakeModel</option>
+                    }
+                </select>
+            }
+            else if (selectedCustomer != null && selectedCustomersVehicles.Count == 0)
+            {
+                <p>No vehicles found for @selectedCustomer.Name</p>
+            }
+        }
+        else
+        {
+            <p class="fw-bold">Input a customer's last name to search...</p>
+        }
+
+    </div>
+
+    @if (selectedVehicle != null)
+    {
+        <div class="d-flex flex-column gap-4">
+            <h3>@selectedVehicle.MakeModel</h3>
+            <section>
+                <label>Service</label>
+                <input @bind-value="currentJobDetail.Description" />
+                <button class="btn btn-primary" style="width: 4rem;" @onclick="AddDetailToJob">Add</button>
+                <button class="btn btn-dark" style="width: 4rem;" @onclick="ResetCurrentJobDetail">Reset</button>
+            </section>
+            <section>
+                <label>Std Srv</label>
+                <div class="d-flex align-items-center">
+                    <select id="standardServiceList" @bind="currentJobDetail.Description" class="form-control input-background">
+                        <option value="">select...</option>
+                        @foreach (var service in standardServices)
+                        {
+                            <option value="@service">@service</option>
+                        }
+                    </select>
+                    <p class="w-50 fw-bold mx-3 form-text text-primary" style="font-size: 18px;">▲</p>
+                </div>
+      
+            </section>
+            <section class="d-flex flex-column gap-4">
+                <div class="d-flex flex-column">
+                    <label>Hours</label>
+                    <InputNumber class="form-control" @bind-Value="currentJobDetail.JobHour" min="0" Step="0.1" />
+                </div>
+
+                <h5>Shop Rate: @SHOP_RATE.ToString("F2")</h5>
+            </section>
+            <section class="d-flex flex-column">
+                <label>Comment</label>
+                <InputTextArea class="form-control" @bind-Value="currentJobDetail.Comment" />
+            </section>
+
+            <section class="d-flex flex-column">
+                <label>Coupon</label>
+                
+
+                @if (discountPercentage != 0)
+                {
+                    <div class="d-flex gap-4">
+                        <p>Discount: @(discountPercentage)%</p>
+                        <button class="btn btn-dark" style="width: 4rem;" @onclick="ResetCoupon">↻</button>
+                    </div>
+                }
+                else
+                {
+                    <div class="d-flex gap-2">
+                        <InputText type="text" class="form-control" style="width: 8rem;" @bind-Value="couponValue" />
+                        <button class="btn btn-outline-primary fw-bold" style="width: 6rem;" @onclick="ValidateCoupon">Apply</button>
+                    </div>
+                }
+            </section>
+
+            @if (currentJobDetails.Count > 0)
+            {
+                <TableTemplate Items="currentJobDetails" Context="JobDetailView">
+                    <TableHeader>
+                        <th></th>
+                        <th>Service</th>
+                        <th>Hrs</th>
+                        <th>Comment</th>
+                    </TableHeader>
+                    <RowTemplate>
+                        <button class="btn text-danger text-primary" @onclick="() => RemoveJobDetail(JobDetailView)">X</button>
+                        <td>@JobDetailView.Description</td>
+                        <td>@JobDetailView.JobHour</td>
+                        <td>@JobDetailView.Comment</td>
+                    </RowTemplate>
+                </TableTemplate>
+
+                <section>
+                    <div class="d-flex gap-4">
+                        <h4>Labour Est.</h4>
+                        <p>(Parts are extra)</p>
+                    </div>
+
+                    <div class="d-flex gap-4">
+                        <p>Hrs: @TotalHours</p>
+                        <p>Subtotal: $@SubTotal.ToString("F2")</p>
+                        <p>Tax: $@TaxAmount.ToString("F2")</p>
+                    </div>
+                </section>
+            }
+
+        </div>
+    }
+
+</div>
+

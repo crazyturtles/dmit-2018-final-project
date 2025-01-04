@@ -1,0 +1,55 @@
+﻿@page "/Receiving/ReceivingComponent"
+@using EBikeApp.Components.Layout
+@using EBikeApp.Components.BlazorPagination
+
+<PageTitle>Receiving Page </PageTitle>
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<h3>Receiving</h3>
+<header>
+    <br />
+    <h4>Outstanding Orders</h4>
+</header>
+<body>
+<div class="outstanding orders">
+        @if (PurchaseOrders.Count > 0)
+        {
+            <TableTemplate Items="PurchaseOrders" Context="PurchaseOrderView">
+            <TableHeader>
+                <th>PO #</th>
+                <th>Date</th>
+                <th>Vendor</th>
+                <th>Contact</th>
+                <th></th>
+            </TableHeader>
+            <RowTemplate>
+                <td>@PurchaseOrderView.PurchaseOrderNumber</td>
+                <td>@PurchaseOrderView.OrderDate</td>
+                <td>@PurchaseOrderView.VendorName</td>
+                <td>@PurchaseOrderView.VendorPhone</td>
+                <td><button class="btn btn-primary" @onclick="() => Receiving_FetchOrderDetails(PurchaseOrderView.PurchaseOrderID)">View Order</button></td>
+            </RowTemplate>
+        </TableTemplate>
+        }
+ </div>
+        
+</body>
+<footer>
+    @if (hasFeedback)
+    {
+        <blockquote>@feedbackMessage</blockquote>
+    }
+    @if (hasError)
+    {
+        <blockquote>
+            @errorMessage
+            <ul>
+                @foreach (var detail in errorDetails)
+                {
+                    <li>@detail</li>
+                }
+            </ul>
+        </blockquote>
+    }
+</footer>
