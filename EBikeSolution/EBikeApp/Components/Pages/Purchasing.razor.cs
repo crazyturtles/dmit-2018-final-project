@@ -115,11 +115,14 @@ namespace EBikeApp.Components.Pages
         {
             try
             {
-                var allItems = PurchasingService.GetInventory(vendorID);
-                items = allItems.Where(inventoryItem =>
-                    !POD.Any(orderDetail => orderDetail.PartID == inventoryItem.PartID)).ToList();
+                if (vendorID > 0)
+                {
+                    var allItems = PurchasingService.GetInventory(vendorID);
+                    items = allItems.Where(inventoryItem =>
+                        !POD.Any(orderDetail => orderDetail.PartID == inventoryItem.PartID)).ToList();
 
-                StateHasChanged();
+                    StateHasChanged();
+                }
             }
             catch (ArgumentNullException ex)
             {
@@ -131,8 +134,6 @@ namespace EBikeApp.Components.Pages
             }
             catch (AggregateException ex)
             {
-                //  have a collection of errors
-                //  each error should be place into a separate line
                 if (!string.IsNullOrWhiteSpace(errorMessage))
                 {
                     errorMessage = $"{errorMessage}{Environment.NewLine}";
